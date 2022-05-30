@@ -1,4 +1,5 @@
 using Application;
+using DataingAppApi.Extensions;
 using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,10 +10,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(c => {
+    c.AddPolicy("CustomPolicy", options => {
+        options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
 
 // adding library by dependecy injection
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddIdentityService(builder.Configuration);
 
 var app = builder.Build();
 
@@ -24,6 +31,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("CustomPolicy");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

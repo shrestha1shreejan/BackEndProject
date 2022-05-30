@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interface;
-using Domain.DatingSite;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +7,7 @@ namespace DataingAppApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class UsersController : ControllerBase
     {
         private readonly IDbContext _dbContext;
@@ -23,12 +24,13 @@ namespace DataingAppApi.Controllers
         #region methods
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _dbContext.Users.ToListAsync();
             return Ok(users);
         }
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {

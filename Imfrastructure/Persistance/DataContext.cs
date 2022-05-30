@@ -16,5 +16,10 @@ namespace Infrastructure.Persistance
         #endregion
 
         public DbSet<AppUser> Users { get; set; }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
     }
 }

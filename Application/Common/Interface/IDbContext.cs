@@ -6,5 +6,6 @@ namespace Application.Common.Interface
     public interface IDbContext
     {
         public DbSet<AppUser> Users { get; set; }
+        Task<int> SaveChangesAsync();
     }
 }
