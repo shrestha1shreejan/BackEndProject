@@ -37,7 +37,7 @@ namespace DataingAppApi.Controllers
             var user = await _dbContext.Users.FindAsync(id);
             return Ok(user);
         }
-
+        
         #endregion
 
     }

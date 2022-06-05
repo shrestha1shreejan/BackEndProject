@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistance
 {
-    internal sealed  class DataContext : DbContext, IDbContext
+    internal sealed class DataContext : DbContext, IDbContext
     {
         #region Constructor
 

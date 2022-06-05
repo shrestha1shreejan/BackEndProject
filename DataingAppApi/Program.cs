@@ -1,6 +1,7 @@
 using Application;
 using DataingAppApi.Extensions;
 using Infrastructure;
+using Application.Common.ErrorHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddIdentityService(builder.Configuration);
 
 var app = builder.Build();
-
+app.UseMiddleware<ExceptionsMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
