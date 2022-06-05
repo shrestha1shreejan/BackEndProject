@@ -1,40 +1,43 @@
-﻿using Application.Common.Interface;
+﻿using Application.DatingApp.Interface;
+using AutoMapper;
+using Domain.DatingSite.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataingAppApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    
     public class UsersController : ControllerBase
     {
-        private readonly IDbContext _dbContext;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
         #region Constructor
 
-        public UsersController(IDbContext dbContext)
+        public UsersController(IUserRepository userRepository, IMapper mapper)
         {
-            _dbContext = dbContext;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         #endregion
 
         #region methods
 
-        [HttpGet]
-        [AllowAnonymous]
+        [HttpGet]        
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = await _dbContext.Users.ToListAsync();
+            var users = await _userRepository.GetMembersAsync();           
             return Ok(users);
         }
-        [Authorize]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
+        
+        [HttpGet("{username}")]
+        public async Task<IActionResult> GetUser(string username)
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await _userRepository.GetMemberAsync(username);            
             return Ok(user);
         }
         

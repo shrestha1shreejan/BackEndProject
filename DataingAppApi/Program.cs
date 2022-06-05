@@ -2,8 +2,11 @@ using Application;
 using DataingAppApi.Extensions;
 using Infrastructure;
 using Application.Common.ErrorHandling;
+using Infrastructure.Persistance;
+using Application.Common.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 
@@ -23,6 +26,9 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddIdentityService(builder.Configuration);
 
 var app = builder.Build();
+
+
+
 app.UseMiddleware<ExceptionsMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,5 +46,23 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// adding seed
+var scopeFactory = app.Services.GetService<IServiceScopeFactory>();
+using var scope = scopeFactory.CreateScope();
+var service = scope.ServiceProvider;
+try
+{
+    var context = service.GetRequiredService<IDbContext>();
+    await context.MigrateAsync();
+    await Seed.SeedUser(context);
+}
+catch (Exception exception)
+{
+    var logger = service.GetRequiredService<ILogger<Program>>();
+    logger.LogError(exception, "exception occured during migration");
+}
+await app.RunAsync();
+//
 
 app.Run();

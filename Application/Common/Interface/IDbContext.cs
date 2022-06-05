@@ -7,5 +7,7 @@ namespace Application.Common.Interface
     {
         public DbSet<AppUser> Users { get; set; }
         Task<int> SaveChangesAsync();
+        Task MigrateAsync();
+        void Update(AppUser user);
     }
 }

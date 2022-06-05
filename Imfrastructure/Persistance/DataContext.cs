@@ -7,7 +7,7 @@ namespace Infrastructure.Persistance
     internal sealed class DataContext : DbContext, IDbContext
     {
         #region Constructor
-
+      
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 
@@ -17,9 +17,19 @@ namespace Infrastructure.Persistance
 
         public DbSet<AppUser> Users { get; set; }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task MigrateAsync()
         {
+             await base.Database.MigrateAsync();
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {            
             return await base.SaveChangesAsync();
+        }
+
+        public void Update(AppUser user)
+        {
+            base.Entry(user).State = EntityState.Modified;
         }
     }
 }
