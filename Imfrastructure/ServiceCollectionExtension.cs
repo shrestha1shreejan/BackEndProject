@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interface;
+using Application.DatingApp.Interface;
+using Domain.Configuration;
 using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,8 +12,10 @@ namespace Infrastructure
     {
         public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DataContext>(options => 
-                options.UseSqlite(configuration.GetConnectionString("DatabaseCS"), 
+            // strongly type configurations settings (have to Bind it in the dependency injetion class)
+            services.Configure<CloudinarySettings>(x => configuration.GetSection("CloudinarySettings").Bind(x));
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DatabaseCS"),
                 b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
             );
             //services.AddDbContext<DataContext>(options => 
@@ -19,6 +23,7 @@ namespace Infrastructure
             // b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
             // );
             services.AddScoped<IDbContext>(provider => provider.GetService<DataContext>());
+            services.AddScoped<IPhotoService, PhotoService>();
             return services;
         }
     }
