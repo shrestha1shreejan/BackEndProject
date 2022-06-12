@@ -55,7 +55,7 @@ namespace DataingAppApi.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<AppUser>> Login (LoginDto loginDto)
         {
-            var user = await _dbContext.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
+            var user = await _dbContext.Users.Include(p => p.Photos).SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
 
             if (user == null)
             {
@@ -88,7 +88,7 @@ namespace DataingAppApi.Controllers
 
         private UserDto GetUserDto (AppUser user)
         {
-            var userDto = new UserDto { Username = user.UserName, Token = _tokenService.CreateToken(user) };
+            var userDto = new UserDto { Username = user.UserName, Token = _tokenService.CreateToken(user), PhotoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url };
             return userDto;
         }
 
