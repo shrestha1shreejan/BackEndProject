@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interface;
 using Application.Token;
+using AutoMapper;
 using Domain.Common.Auth;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
@@ -16,13 +17,15 @@ namespace DataingAppApi.Controllers
     {
         private readonly IDbContext _dbContext;
         private readonly ITokenService _tokenService;
+        private readonly IMapper _mapper;
 
         #region Constructor
 
-        public AccountController(IDbContext dbContext, ITokenService tokenService)
+        public AccountController(IDbContext dbContext, ITokenService tokenService, IMapper mapper)
         {
             _dbContext = dbContext;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
         #endregion
@@ -36,16 +39,15 @@ namespace DataingAppApi.Controllers
             {
                 return BadRequest("Username is already taken");
             }
+
+            var user = _mapper.Map<AppUser>(registerDto);
             // hashing
             using var hmac = new HMACSHA512();
 
-            var user = new AppUser
-            {
-                UserName = registerDto.Username.ToLower(),
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-                PasswordSalt = hmac.Key
-            };
-
+            user.UserName = registerDto.Username.ToLower();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
+            user.PasswordSalt = hmac.Key;
+ 
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
             
@@ -88,7 +90,12 @@ namespace DataingAppApi.Controllers
 
         private UserDto GetUserDto (AppUser user)
         {
-            var userDto = new UserDto { Username = user.UserName, Token = _tokenService.CreateToken(user), PhotoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url };
+            var userDto = new UserDto { 
+                Username = user.UserName, 
+                Token = _tokenService.CreateToken(user), 
+                KnownAs = user?.KnownAs,
+                PhotoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url 
+            };
             return userDto;
         }
 

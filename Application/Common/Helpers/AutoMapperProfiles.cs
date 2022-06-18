@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Common.Auth;
 using Domain.Common.ExtensionMethods;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
@@ -17,6 +18,7 @@ namespace Application.Common.Helpers
                 sourceMember => sourceMember.MapFrom(src => src.DateOfBirth.CalculateAge()));
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>();
+            CreateMap<RegisterDto, AppUser>();
         }
 
         #endregion
