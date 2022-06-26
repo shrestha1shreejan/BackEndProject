@@ -22,6 +22,7 @@ namespace Application
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<LogUserActivity>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;
         }
