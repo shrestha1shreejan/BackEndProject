@@ -1,4 +1,5 @@
 ﻿using Application.Common.Helpers;
+using Application.DatingApp;
 using Application.DatingApp.Interface;
 using Application.Token;
 using Microsoft.Extensions.Configuration;
@@ -17,8 +18,9 @@ namespace Application
             //services.AddDbContext<DataContext>(options => 
             // options.UseSqlServer(configuration.GetConnectionString("DatabaseCS"), 
             // b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
-            // );
+            // );            
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<LogUserActivity>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;

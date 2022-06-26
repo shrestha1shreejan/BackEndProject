@@ -10,10 +10,8 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace DataingAppApi.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AccountController : ControllerBase
+{    
+    public class AccountController : BaseApiController
     {
         private readonly IDbContext _dbContext;
         private readonly ITokenService _tokenService;
@@ -94,7 +92,8 @@ namespace DataingAppApi.Controllers
                 Username = user.UserName, 
                 Token = _tokenService.CreateToken(user), 
                 KnownAs = user?.KnownAs,
-                PhotoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url 
+                PhotoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url,
+                Gender = user?.Gender
             };
             return userDto;
         }

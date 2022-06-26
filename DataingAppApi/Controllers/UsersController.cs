@@ -1,19 +1,17 @@
-﻿using Application.DatingApp.Interface;
+﻿using Application.Common.Helpers;
+using Application.DatingApp.Interface;
 using AutoMapper;
+using DataingAppApi.Extensions;
 using Domain.Common.ExtensionMethods;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace DataingAppApi.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
+    [Authorize]   
+    public class UsersController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
         private readonly IPhotoService _photoService;
@@ -33,9 +31,20 @@ namespace DataingAppApi.Controllers
         #region methods
 
         [HttpGet]        
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromQuery]UserParams userParams)
         {
-            var users = await _userRepository.GetMembersAsync();           
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            
+            userParams.CurrentUsername = User.GetUsername();
+            if (string.IsNullOrEmpty(userParams.Gender))
+            {
+                userParams.Gender = user.Gender == "male" ? "female" : "male";
+            }
+
+            var users = await _userRepository.GetMembersAsync(userParams);
+
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+
             return Ok(users);
         }
         

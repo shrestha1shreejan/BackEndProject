@@ -16,6 +16,7 @@ namespace Infrastructure.Persistance
         #endregion
 
         public DbSet<AppUser> Users { get; set; }
+        public DbSet<UserLike> Likes { get; set; }
 
         public async Task MigrateAsync()
         {
@@ -30,6 +31,30 @@ namespace Infrastructure.Persistance
         public void Update(AppUser user)
         {
             base.Entry(user).State = EntityState.Modified;
+        }
+
+        /// <summary>
+        /// override method for the migrations work
+        /// HasKey(k => new { k.SourceUserId, k.LikedUserId }) creates key for the joint table
+        /// </summary>
+        /// <param name="builder"></param>
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<UserLike>().HasKey(k => new { k.SourceUserId, k.LikedUserId });
+
+            /// defining relation
+            builder.Entity<UserLike>()
+                .HasOne(s => s.SourceUser)
+                .WithMany(l => l.LikedUsers)
+                .HasForeignKey(s => s.SourceUserId)
+                .OnDelete(DeleteBehavior.Cascade); // DeleteBehavior.Noaction in case of sql server
+
+            builder.Entity<UserLike>()
+                .HasOne(s => s.LikedUser)
+                .WithMany(l => l.LikedByUsers)
+                .HasForeignKey(s => s.LikedUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
