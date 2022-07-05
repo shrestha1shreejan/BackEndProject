@@ -35,7 +35,10 @@ namespace Application.DatingApp
 
         public async Task<Message> GetMessage(int id)
         {
-            return await _context.Messages.FindAsync(id);
+            return await _context.Messages
+                .Include(u => u.Sender)
+                .Include(u => u.Recipient)
+                .SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams)
@@ -44,9 +47,12 @@ namespace Application.DatingApp
 
             query = messageParams.Container switch
             {
-                "Inbox" =>  query.Where(u => u.Recipient.UserName == messageParams.Username),
-                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username),
-                _ => query.Where(u => u.Recipient.UserName == messageParams.Username && u.DateRead == null)
+                "Inbox" =>  query.Where(u => u.Recipient.UserName == messageParams.Username 
+                    && u.RecipientDeletedd == false), // return messages that recipient hasn't deleted
+                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username 
+                    && u.SenderDeleted == false), // return messages that sender hasn't deleted
+                _ => query.Where(u => u.Recipient.UserName == messageParams.Username && u.DateRead == null 
+                    && u.RecipientDeletedd == false)
             };
 
             var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
@@ -56,15 +62,17 @@ namespace Application.DatingApp
 
         public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
         {
-            /// Get the message conversation between two users
+            /// Get the message conversation between two users that are not deleted by either user
             var messages = await _context.Messages
                 .Include(u => u.Sender).ThenInclude(p => p.Photos)
                 .Include(u => u.Recipient).ThenInclude(p => p.Photos)
                 .Where(
                     m => m.Recipient.UserName == currentUsername &&
+                    m.RecipientDeletedd == false &&
                     m.Sender.UserName == recipientUsername ||
                     m.Recipient.UserName == recipientUsername &&
-                    m.Sender.UserName == currentUsername
+                    m.Sender.UserName == currentUsername &&
+                    m.SenderDeleted == false
                 )
                 .OrderBy( m => m.MessageSent)
                 .ToListAsync();
