@@ -28,8 +28,7 @@ namespace DataingAppApi.Controllers
 
         #endregion
 
-        #region methods
-
+        #region methods       
         [HttpGet]        
         public async Task<IActionResult> GetAllUsers([FromQuery]UserParams userParams)
         {
@@ -53,7 +52,7 @@ namespace DataingAppApi.Controllers
         /// Specifying the route name for using as Created at route params
         /// </summary>
         /// <param name="username"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
         [HttpGet("{username}",Name = "GetUser")]
         public async Task<IActionResult> GetUser(string username)
         {

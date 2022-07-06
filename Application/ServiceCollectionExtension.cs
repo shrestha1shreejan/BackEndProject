@@ -20,10 +20,7 @@ namespace Application
             // b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
             // );            
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<LogUserActivity>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILikesRepository, LikesRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<LogUserActivity>();            
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;
         }

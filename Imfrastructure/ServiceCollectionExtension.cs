@@ -23,6 +23,9 @@ namespace Infrastructure
             // b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
             // );
             services.AddScoped<IDbContext>(provider => provider.GetService<DataContext>());
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IPhotoService, PhotoService>();
             return services;
         }

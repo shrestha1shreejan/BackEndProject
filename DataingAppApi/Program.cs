@@ -4,6 +4,10 @@ using Infrastructure;
 using Application.Common.ErrorHandling;
 using Infrastructure.Persistance;
 using Application.Common.Interface;
+using Microsoft.AspNetCore.Identity;
+using Domain.DatingSite;
+using Microsoft.EntityFrameworkCore;
+using Domain.Common.Auth.IdentityAuth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,9 +57,11 @@ using var scope = scopeFactory.CreateScope();
 var service = scope.ServiceProvider;
 try
 {
-    var context = service.GetRequiredService<IDbContext>();
-    await context.MigrateAsync();
-    await Seed.SeedUser(context);
+    var context = service.GetRequiredService<DataContext>();
+    var userManager = service.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = service.GetRequiredService<RoleManager<AppRole>>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUser(userManager, roleManager);
 }
 catch (Exception exception)
 {
