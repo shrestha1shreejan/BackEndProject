@@ -1,4 +1,6 @@
-﻿namespace Domain.DatingSite.Dtos
+﻿using System.Text.Json.Serialization;
+
+namespace Domain.DatingSite.Dtos
 {
     public  class MessageDto
     {
@@ -13,6 +15,11 @@
         public string Content { get; set; }
         public DateTime? DateRead { get; set; }
         public DateTime MessageSent { get; set; }
+
+        [JsonIgnore]
+        public bool SenderDeleted { get; set; }
+        [JsonIgnore]
+        public bool RecipientDeletedd { get; set; }
 
     }
 }

@@ -45,29 +45,32 @@ namespace Infrastructure.Persistance
 
         public async Task<PagedList<MessageDto>> GetMessageForUser(MessageParams messageParams)
         {
-            var query = _context.Messages.OrderByDescending(m => m.MessageSent).AsQueryable();
+            var query = _context.Messages
+                .OrderByDescending(m => m.MessageSent)
+                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
+                .AsQueryable();
 
             query = messageParams.Container switch
             {
-                "Inbox" =>  query.Where(u => u.Recipient.UserName == messageParams.Username 
+                "Inbox" =>  query.Where(u => u.RecipientUserName == messageParams.Username 
                     && u.RecipientDeletedd == false), // return messages that recipient hasn't deleted
-                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username 
+                "Outbox" => query.Where(u => u.SenderUserName == messageParams.Username 
                     && u.SenderDeleted == false), // return messages that sender hasn't deleted
-                _ => query.Where(u => u.Recipient.UserName == messageParams.Username && u.DateRead == null 
+                _ => query.Where(u => u.RecipientUserName == messageParams.Username && u.DateRead == null 
                     && u.RecipientDeletedd == false)
             };
 
-            var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
+            // var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
 
-            return await PagedList<MessageDto>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
+            return await PagedList<MessageDto>.CreateAsync(query, messageParams.PageNumber, messageParams.PageSize);
         }
 
         public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
         {
             /// Get the message conversation between two users that are not deleted by either user
             var messages = await _context.Messages
-                .Include(u => u.Sender).ThenInclude(p => p.Photos)
-                .Include(u => u.Recipient).ThenInclude(p => p.Photos)
+                //.Include(u => u.Sender).ThenInclude(p => p.Photos) // not needed due to projection
+                //.Include(u => u.Recipient).ThenInclude(p => p.Photos)
                 .Where(
                     m => m.Recipient.UserName == currentUsername &&
                     m.RecipientDeletedd == false &&
@@ -77,11 +80,12 @@ namespace Infrastructure.Persistance
                     m.SenderDeleted == false
                 )
                 .OrderBy( m => m.MessageSent)
+                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
             ///
 
             /// check if unread messages for current user are there and mark them as read
-            var unreadMessages = messages.Where( m => m.DateRead == null && m.Recipient.UserName == currentUsername).ToList();
+            var unreadMessages = messages.Where( m => m.DateRead == null && m.RecipientUserName == currentUsername).ToList();
 
             if (unreadMessages.Any())
             {
@@ -93,7 +97,8 @@ namespace Infrastructure.Persistance
                 // await _context.SaveChangesAsync();
             }
 
-            return _mapper.Map<IEnumerable<MessageDto>>(messages);
+            // return _mapper.Map<IEnumerable<MessageDto>>(messages);
+            return messages;
         }
 
         // will save in unit of work pattern
