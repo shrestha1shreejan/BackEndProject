@@ -57,6 +57,10 @@ namespace Infrastructure.Persistance
             base.Entry(user).State = EntityState.Modified;
         }
 
+        public bool HasChanges()
+        {
+            return base.ChangeTracker.HasChanges();
+        }
         /// <summary>
         /// override method for the migrations work
         /// HasKey(k => new { k.SourceUserId, k.LikedUserId }) creates key for the joint table

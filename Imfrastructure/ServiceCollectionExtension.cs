@@ -23,10 +23,13 @@ namespace Infrastructure
             // b => b.MigrationsAssembly(typeof(DataContext).Assembly.FullName)), ServiceLifetime.Transient
             // );
             services.AddScoped<IDbContext>(provider => provider.GetService<DataContext>());
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILikesRepository, LikesRepository>();            
             services.AddScoped<IPhotoService, PhotoService>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
+
+            /// removing as using unit of work pattern
+            //services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<ILikesRepository, LikesRepository>();                        
+            //services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
     }

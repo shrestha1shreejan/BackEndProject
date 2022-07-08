@@ -13,9 +13,12 @@ namespace Infrastructure.Persistance.Interface
         // Group user tracking
         public DbSet<Group> Groups { get; set; }
         public DbSet<Connection> Connections { get; set; }
+        
         //
         Task<int> SaveChangesAsync();
         Task MigrateAsync();
         void Update(AppUser user);
+
+        bool HasChanges();
     }
 }

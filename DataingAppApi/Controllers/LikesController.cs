@@ -12,13 +12,20 @@ namespace DataingAppApi.Controllers
     [Authorize]
     public class LikesController : BaseApiController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly ILikesRepository _likesRepository;
+        private readonly IUnitOfWork _unitOfWork;
+
+        //private readonly IUserRepository _unitOfWork.UserRepository;
+        //private readonly ILikesRepository _unitOfWork.LikesRepository;
         #region Constructor
-        public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
+        //public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
+        //{
+        //    _unitOfWork.UserRepository = userRepository;
+        //    _unitOfWork.LikesRepository = likesRepository;
+        //}
+
+        public LikesController(IUnitOfWork unitOfWork)
         {
-            _userRepository = userRepository;
-            _likesRepository = likesRepository;
+            _unitOfWork = unitOfWork;
         }
         #endregion
 
@@ -28,8 +35,8 @@ namespace DataingAppApi.Controllers
         public async Task<IActionResult> AddLike(string username)
         {
             var sourceUserId = User.GetUserId();
-            var likedUser = await _userRepository.GetUserByUsernameAsync(username);
-            var sourceuser = await _likesRepository.GetUserWithLikes(sourceUserId);
+            var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+            var sourceuser = await _unitOfWork.LikesRepository.GetUserWithLikes(sourceUserId);
 
             if (likedUser == null)
             {
@@ -41,7 +48,7 @@ namespace DataingAppApi.Controllers
                 return BadRequest("You can't like yourself");
             }
 
-            var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+            var userLike = await _unitOfWork.LikesRepository.GetUserLike(sourceUserId, likedUser.Id);
 
             if (userLike != null)
             {
@@ -56,7 +63,7 @@ namespace DataingAppApi.Controllers
 
             sourceuser.LikedUsers.Add(userLike);
 
-            if (await _userRepository.SaveAllAsync())
+            if (await _unitOfWork.Complete())
             {
                 return Ok();
             }
@@ -69,7 +76,7 @@ namespace DataingAppApi.Controllers
         public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery]LikesParams likesParams)
         {
             likesParams.UserId = User.GetUserId();
-            var users = await _likesRepository.GetUserLikes(likesParams);
+            var users = await _unitOfWork.LikesRepository.GetUserLikes(likesParams);
 
             Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 

@@ -13,7 +13,7 @@ namespace Infrastructure.Persistance
         private readonly IDbContext _context;
 
         #region Constructor
-        public LikesRepository(DataContext context)
+        public LikesRepository(IDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
