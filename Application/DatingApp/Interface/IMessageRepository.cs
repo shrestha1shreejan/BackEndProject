@@ -12,6 +12,14 @@ namespace Application.DatingApp.Interface
         void RemoveConnection(Connection connection);
         Task<Connection> GetConnectionAsync(string connectionId);
         Task<Group> GetMessageGroup(string groupName);
+
+        //
+        /// <summary>
+        /// Get the group related to the particular connectionId
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        Task<Group> GetGroupForConnection(string connectionId);
         ///
 
         void AddMessage(Message message);
