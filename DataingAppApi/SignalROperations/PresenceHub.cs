@@ -22,9 +22,10 @@ namespace DataingAppApi.SignalROperations
         public override async Task OnConnectedAsync()
         {
 
-            await _tracker.UserConnected(Context.User.GetUsername(), Context.ConnectionId);
+            var isOnline = await _tracker.UserConnected(Context.User.GetUsername(), Context.ConnectionId);
 
-            await Clients.Others.SendAsync("UserIsOnline", Context.User.GetUsername());
+            if (isOnline)
+                await Clients.Others.SendAsync("UserIsOnline", Context.User.GetUsername());
 
             await SendOnlineDetailsAsync();
         }
@@ -36,11 +37,11 @@ namespace DataingAppApi.SignalROperations
         /// <returns></returns>
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await _tracker.UserDisconnected(Context.User.GetUsername(), Context.ConnectionId);
+            var isOffline = await _tracker.UserDisconnected(Context.User.GetUsername(), Context.ConnectionId);
 
-            await Clients.Others.SendAsync("UserIsOffline", Context.User.GetUsername());
-
-            await SendOnlineDetailsAsync();
+            if(isOffline)
+                await Clients.Others.SendAsync("UserIsOffline", Context.User.GetUsername());
+           
             /// Passing the exception to the base class
             await base.OnDisconnectedAsync(exception);
         }
@@ -53,7 +54,7 @@ namespace DataingAppApi.SignalROperations
         private async Task SendOnlineDetailsAsync()
         {
             var currentUsers = await _tracker.GetOnlineUsers();
-            await Clients.All.SendAsync("GetOnlineUsers", currentUsers);
+            await Clients.Caller.SendAsync("GetOnlineUsers", currentUsers);
         }
     }
 }
