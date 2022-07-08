@@ -1,21 +1,21 @@
 ﻿using Application.Common.Helpers;
-using Application.Common.Interface;
 using Application.DatingApp.Interface;
 using Domain.Common.ExtensionMethods;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
+using Infrastructure.Persistance.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistance
 {
     internal class LikesRepository : ILikesRepository
     {
-        private readonly DataContext _context;
+        private readonly IDbContext _context;
 
         #region Constructor
         public LikesRepository(DataContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(IDbContext));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
         #endregion      
 

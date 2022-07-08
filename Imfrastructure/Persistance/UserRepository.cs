@@ -1,21 +1,21 @@
 ﻿using Application.Common.Helpers;
-using Application.Common.Interface;
 using Application.DatingApp.Interface;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
+using Infrastructure.Persistance.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistance
 {
     internal sealed class UserRepository : IUserRepository
     {
-        private readonly DataContext _context;
+        private readonly IDbContext _context;
         private readonly IMapper _mapper;
 
         #region Constructor
-        public UserRepository(DataContext context, IMapper mapper)
+        public UserRepository(IDbContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));

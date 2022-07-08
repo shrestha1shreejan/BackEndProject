@@ -21,7 +21,7 @@ namespace Application
             // );            
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<LogUserActivity>();            
-            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);            
             return services;
         }
     }

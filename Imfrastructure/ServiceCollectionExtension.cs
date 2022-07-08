@@ -1,7 +1,7 @@
-﻿using Application.Common.Interface;
-using Application.DatingApp.Interface;
+﻿using Application.DatingApp.Interface;
 using Domain.Configuration;
 using Infrastructure.Persistance;
+using Infrastructure.Persistance.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +24,9 @@ namespace Infrastructure
             // );
             services.AddScoped<IDbContext>(provider => provider.GetService<DataContext>());
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILikesRepository, LikesRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();            
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             return services;
         }
     }

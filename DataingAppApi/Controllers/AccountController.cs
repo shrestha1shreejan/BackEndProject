@@ -1,18 +1,14 @@
-﻿using Application.Common.Interface;
-using Application.Token;
+﻿using Application.Token;
 using AutoMapper;
 using Domain.Common.Auth;
 using Domain.DatingSite;
 using Domain.DatingSite.Dtos;
-using Infrastructure.Persistance;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace DataingAppApi.Controllers
-{    
+{
     public class AccountController : BaseApiController
     {
         // private readonly DataContext _dbContext;

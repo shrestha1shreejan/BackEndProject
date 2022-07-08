@@ -1,6 +1,7 @@
-﻿using Application.Common.Interface;
-using Domain.Common.Auth.IdentityAuth;
+﻿using Domain.Common.Auth.IdentityAuth;
 using Domain.DatingSite;
+using Domain.DatingSite.TrackingEntities;
+using Infrastructure.Persistance.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +20,7 @@ namespace Infrastructure.Persistance
         IdentityUserLogin<int>, 
         IdentityRoleClaim<int>, 
         IdentityUserToken<int>
-        >
-        , IDbContext
+        >   , IDbContext    
     {
         #region Constructor
       
@@ -31,10 +31,15 @@ namespace Infrastructure.Persistance
 
         #endregion
 
-        // Removing this as Identity will do this for us
-        // public DbSet<AppUser> Users { get; set; }
+        // Removing this as Identity will do this for us      
+        public DbSet<Photo> Photos { get; set; }
         public DbSet<UserLike> Likes { get; set; }
         public DbSet<Message> Messages { get; set; }
+
+        // Group user tracking
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<Connection> Connections { get; set; }
+        //
 
         public async Task MigrateAsync()
         {
@@ -43,7 +48,8 @@ namespace Infrastructure.Persistance
 
         public async Task<int> SaveChangesAsync()
         {            
-            return await base.SaveChangesAsync();
+            var result = await base.SaveChangesAsync();
+            return result;
         }
 
         public void Update(AppUser user)

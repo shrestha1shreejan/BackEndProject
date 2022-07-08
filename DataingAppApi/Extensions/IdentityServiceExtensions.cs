@@ -1,5 +1,4 @@
-﻿using Application.Common.Interface;
-using Domain.Common.Auth.IdentityAuth;
+﻿using Domain.Common.Auth.IdentityAuth;
 using Domain.DatingSite;
 using Infrastructure.Persistance;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,6 +30,25 @@ namespace DataingAppApi.Extensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"])),
                     ValidateIssuer = false,
                     ValidateAudience = false
+                };
+                
+                // For getting token using query string for signalR 
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        // signalR send the token in a query paramter called access_token
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // look for path that matches signalR hub endpoint
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

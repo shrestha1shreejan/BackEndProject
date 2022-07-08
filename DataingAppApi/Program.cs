@@ -3,11 +3,11 @@ using DataingAppApi.Extensions;
 using Infrastructure;
 using Application.Common.ErrorHandling;
 using Infrastructure.Persistance;
-using Application.Common.Interface;
 using Microsoft.AspNetCore.Identity;
 using Domain.DatingSite;
 using Microsoft.EntityFrameworkCore;
 using Domain.Common.Auth.IdentityAuth;
+using DataingAppApi.SignalROperations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,12 +22,17 @@ builder.Services.AddCors(c => {
     c.AddPolicy("CustomPolicy", options => {
         options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
     });
+    c.AddPolicy("SignalRPolicy", options => {
+        options.AllowCredentials().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true);
+    });
 });
 
 // adding library by dependecy injection
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddIdentityService(builder.Configuration);
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<PresenceTracker>();
 
 var app = builder.Build();
 
@@ -43,13 +48,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("CustomPolicy");
+// app.UseCors("CustomPolicy");
+app.UseCors("SignalRPolicy");
+
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
 // adding seed
 var scopeFactory = app.Services.GetService<IServiceScopeFactory>();
@@ -61,7 +71,7 @@ try
     var userManager = service.GetRequiredService<UserManager<AppUser>>();
     var roleManager = service.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedUser(userManager, roleManager);
+    // await Seed.SeedUser(userManager, roleManager);
 }
 catch (Exception exception)
 {

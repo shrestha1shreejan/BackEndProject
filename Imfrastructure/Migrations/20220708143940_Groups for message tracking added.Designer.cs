@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220706145741_Identity Added")]
-    partial class IdentityAdded
+    [Migration("20220708143940_Groups for message tracking added")]
+    partial class Groupsformessagetrackingadded
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -226,6 +226,35 @@ namespace Infrastructure.Migrations
                     b.ToTable("Photos");
                 });
 
+            modelBuilder.Entity("Domain.DatingSite.TrackingEntities.Connection", b =>
+                {
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ConnectionId");
+
+                    b.HasIndex("GroupName");
+
+                    b.ToTable("Connections");
+                });
+
+            modelBuilder.Entity("Domain.DatingSite.TrackingEntities.Group", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Groups");
+                });
+
             modelBuilder.Entity("Domain.DatingSite.UserLike", b =>
                 {
                     b.Property<int>("SourceUserId")
@@ -374,6 +403,13 @@ namespace Infrastructure.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("Domain.DatingSite.TrackingEntities.Connection", b =>
+                {
+                    b.HasOne("Domain.DatingSite.TrackingEntities.Group", null)
+                        .WithMany("Connections")
+                        .HasForeignKey("GroupName");
+                });
+
             modelBuilder.Entity("Domain.DatingSite.UserLike", b =>
                 {
                     b.HasOne("Domain.DatingSite.AppUser", "LikedUser")
@@ -447,6 +483,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Photos");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.DatingSite.TrackingEntities.Group", b =>
+                {
+                    b.Navigation("Connections");
                 });
 #pragma warning restore 612, 618
         }

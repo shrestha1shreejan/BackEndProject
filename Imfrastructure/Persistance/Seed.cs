@@ -1,10 +1,7 @@
-﻿using Application.Common.Interface;
-using Domain.Common.Auth.IdentityAuth;
+﻿using Domain.Common.Auth.IdentityAuth;
 using Domain.DatingSite;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 
 namespace Infrastructure.Persistance
